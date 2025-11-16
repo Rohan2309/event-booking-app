@@ -52,9 +52,8 @@ app.use('/', ejsRoutes);
 app.use('/api', apiRoutes);
 
 // swagger
-const swaggerUi = require('swagger-ui-express');
-const YAML = require('yamljs');
-const swaggerSpec = YAML.load(path.join(__dirname,'swagger','swagger.yaml'));
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Swagger Docs
+const swaggerSetup = require("./swagger/swagger");
+swaggerSetup(app);
 
 app.listen(PORT, ()=> console.log('Server started on', PORT));
