@@ -19,9 +19,7 @@ dist/
 build/
 .cache/
 
-# ---- Uploads ----
-public/uploads/
-uploads/
+
 
 # ---- System Files ----
 .DS_Store
