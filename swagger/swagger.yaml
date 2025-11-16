@@ -1,0 +1,266 @@
+openapi: 3.0.0
+info:
+  title: Event Booking API
+  version: 1.0.0
+  description: API documentation for Event Booking System
+
+servers:
+  - url: http://localhost:5000/api
+    description: Local API Server
+
+paths:
+
+  /register:
+    post:
+      tags:
+        - Auth
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                role:
+                  type: string
+                  enum: [admin, user]
+      responses:
+        "200":
+          description: Registration success
+        "400":
+          description: Validation error
+
+  /login:
+    post:
+      tags:
+        - Auth
+      summary: Login for API users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Login success and returns tokens
+        "400":
+          description: Invalid credentials
+
+  /refresh:
+    post:
+      tags:
+        - Auth
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        "200":
+          description: New access token generated
+        "400":
+          description: Invalid token
+
+  /logout:
+    post:
+      tags:
+        - Auth
+      summary: Logout user and invalidate refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        "200":
+          description: Logged out
+
+  /events:
+    get:
+      tags:
+        - Events
+      summary: List all events with pagination, filters, and search
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [date, price]
+      responses:
+        "200":
+          description: Returns event list
+
+  /events:
+    post:
+      tags:
+        - Admin Events
+      summary: Create a new event (Admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: { type: string }
+                description: { type: string }
+                date: { type: string }
+                price: { type: number }
+                category: { type: string }
+                capacity: { type: number }
+      responses:
+        "200":
+          description: Event created
+
+  /events/{id}:
+    put:
+      tags:
+        - Admin Events
+      summary: Update event details (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Updated
+
+    delete:
+      tags:
+        - Admin Events
+      summary: Delete event (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted
+
+  /bookings/{eventId}:
+    post:
+      tags:
+        - Bookings
+      summary: Book an event (User API)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tickets:
+                  type: number
+                method:
+                  type: string
+      responses:
+        "200":
+          description: Booking success
+
+  /bookings/{id}/cancel:
+    post:
+      tags:
+        - Bookings
+      summary: Cancel a booking (User API)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Booking cancelled
+
+  /admin/reports/bookings-per-event:
+    get:
+      tags:
+        - Reports
+      summary: Admin report - Bookings per event
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Report data
+
+  /admin/reports/revenue-per-category:
+    get:
+      tags:
+        - Reports
+      summary: Admin report - Revenue per category
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Report data
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

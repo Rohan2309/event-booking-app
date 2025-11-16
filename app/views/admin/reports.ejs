@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>Reports – Admin</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+  <style>
+    body { background: #f4f6f9; }
+
+    .page-title {
+      font-weight: 700;
+      margin-bottom: 25px;
+      color: #333;
+    }
+
+    .report-card {
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      margin-bottom: 25px;
+    }
+
+    .status-badge {
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    .pending { background: #fff3cd; color: #b68900; }
+    .confirmed { background: #d4edda; color: #207538; }
+    .cancelled { background: #f8d7da; color: #a30012; }
+  </style>
+</head>
+
+<body>
+
+<%- include('../partials/header') %>
+
+<div class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="page-title">Reports</h2>
+    <a href="/admin" class="btn btn-secondary">← Back to Dashboard</a>
+  </div>
+
+  <% if (success && success.length) { %>
+    <div class="alert alert-success"><%= success %></div>
+  <% } %>
+
+  <% if (error && error.length) { %>
+    <div class="alert alert-danger"><%= error %></div>
+  <% } %>
+
+  <!-- ALL BOOKINGS ONLY (OTHERS REMOVED) -->
+  <div class="report-card">
+    <h4>📋 All Bookings</h4>
+
+    <table class="table table-bordered mt-3">
+      <thead class="table-light">
+        <tr>
+          <th>User</th>
+          <th>Email</th>
+          <th>Event</th>
+          <th>Date</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Update Status</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% eventBookings.forEach(b => { %>
+          <tr>
+            <td><%= b.user.name %></td>
+            <td><%= b.user.email %></td>
+            <td><%= b.event.title %></td>
+            <td><%= b.event.date.toLocaleDateString() %></td>
+            <td>₹ <%= b.totalAmount %></td>
+
+            <td>
+              <span class="status-badge 
+                <%= b.status === 'pending' ? 'pending' :
+                    b.status === 'confirmed' ? 'confirmed' : 'cancelled' %>">
+                <%= b.status.charAt(0).toUpperCase() + b.status.slice(1) %>
+              </span>
+            </td>
+
+            <td>
+              <form action="/admin/bookings/status/<%= b._id %>" method="POST">
+                <select name="status" class="form-select form-select-sm"
+                        onchange="this.form.submit()">
+
+                  <option value="pending" <%= b.status==='pending'?'selected':'' %>>Pending</option>
+                  <option value="confirmed" <%= b.status==='confirmed'?'selected':'' %>>Confirm</option>
+                  <option value="cancelled" <%= b.status==='cancelled'?'selected':'' %>>Cancel</option>
+
+                </select>
+              </form>
+            </td>
+
+          </tr>
+        <% }) %>
+      </tbody>
+
+    </table>
+  </div>
+
+</div>
+
+<%- include('../partials/footer') %>
+</body>
+</html>

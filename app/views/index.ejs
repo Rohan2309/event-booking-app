@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>EventBook – Discover & Book Amazing Events</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: #f8f9fa;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #4e54c8, #8f94fb);
+      color: white;
+      padding: 80px 0;
+      border-radius: 20px;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .hero h1 {
+      font-weight: 700;
+      font-size: 3rem;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+
+    .event-card {
+      border: none;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .event-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    }
+
+    .event-img {
+      height: 200px;
+      object-fit: cover;
+      border-bottom: 1px solid #eee;
+    }
+
+    .event-price {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #4e54c8;
+    }
+
+    .event-capacity {
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+  </style>
+</head>
+
+<body>
+
+ 
+
+  <div class="container py-4">
+
+    <!-- HERO SECTION -->
+    <div class="hero">
+      <h1>Find Your Next Experience</h1>
+      <p>Discover, book, and enjoy the best events happening around you.</p>
+
+      <% if(!user) { %>
+        <a href="/auth/login" class="btn btn-light btn-lg px-4 me-3">Login</a>
+        <a href="/auth/register" class="btn btn-outline-light btn-lg px-4">Register</a>
+      <% } else { %>
+        <a href="/user/dashboard" class="btn btn-light btn-lg px-4">Go to Dashboard</a>
+      <% } %>
+    </div>
+
+    <!-- Flash messages -->
+    <% if(success && success.length) { %>
+      <div class="alert alert-success mt-4 text-center"><%= success %></div>
+    <% } %>
+    <% if(error && error.length) { %>
+      <div class="alert alert-danger mt-4 text-center"><%= error %></div>
+    <% } %>
+
+    <!-- EVENTS SECTION -->
+    <h3 class="mt-5 mb-3 fw-bold text-center">Upcoming Events</h3>
+
+    <div class="row g-4">
+
+      <% events.forEach(ev => { %>
+      <div class="col-md-4">
+        <div class="card event-card">
+          <% if(ev.image) { %>
+            <img src="<%= ev.image %>" class="event-img" alt="<%= ev.title %>">
+          <% } %>
+
+          <div class="card-body">
+            <h5 class="card-title fw-bold"><%= ev.title %></h5>
+            <p class="text-muted">
+              <%= ev.description ? ev.description.substring(0, 90) : '' %>...
+            </p>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="event-price"><%= ev.price %> INR</span>
+              <span class="event-capacity"><%= ev.capacity %> seats left</span>
+            </div>
+
+            <a href="/events/<%= ev.slug %>" class="btn btn-primary w-100">
+              View Details
+            </a>
+          </div>
+        </div>
+      </div>
+      <% }) %>
+
+    </div>
+
+  </div>
+
+  <%- include("partials/footer") %>
+
+</body>
+</html>
